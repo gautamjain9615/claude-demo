@@ -36,9 +36,6 @@ jobs:
       - name: Generate Swagger spec
         run: swag init -g cmd/server/main.go
 
-      - name: Copy swagger spec to docs
-        run: cp docs/swagger.json docs/swagger.json
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
