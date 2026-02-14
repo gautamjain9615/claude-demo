@@ -36,6 +36,10 @@ jobs:
       - name: Generate Swagger spec
         run: swag init -g cmd/server/main.go
 
+      - name: Inject Render API URL into Swagger UI
+        if: vars.RENDER_API_HOST != ''
+        run: sed -i 's|RENDER_URL|${{ vars.RENDER_API_HOST }}|g' docs/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

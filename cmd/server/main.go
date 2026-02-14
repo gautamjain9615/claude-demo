@@ -4,8 +4,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/gautamjain9615/claude-demo/internal/handlers"
@@ -18,11 +20,21 @@ import (
 // @description	A simple bookstore API built with Go and Chi.
 // @host			localhost:8080
 // @BasePath		/
+// @schemes		http https
 func main() {
 	bookStore := store.NewBookStore()
 	bookHandler := handlers.NewBookHandler(bookStore)
 
 	r := chi.NewRouter()
+
+	// CORS configuration for Swagger UI on GitHub Pages.
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*.github.io", "http://localhost:*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 	r.Use(middleware.Logger)
 
 	// Health check.
@@ -40,9 +52,14 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	log.Println("Starting server on :8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	log.Printf("Starting server on :%s", port)
+
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
 }

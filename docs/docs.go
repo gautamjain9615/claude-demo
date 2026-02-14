@@ -180,7 +180,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
 	BasePath:         "/",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "Bookstore API",
 	Description:      "A simple bookstore API built with Go and Chi.",
 	InfoInstanceName: "swagger",
