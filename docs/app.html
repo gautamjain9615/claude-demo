@@ -56,10 +56,17 @@
       display: inline-block; background: #e8f4e8; color: #27ae60;
       padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
     }
+    .book-card .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
     .book-card .id-badge {
-      float: right; background: #f0f0f0; color: #999;
+      background: #f0f0f0; color: #999;
       padding: 0.15rem 0.5rem; border-radius: 12px; font-size: 0.75rem;
     }
+    .btn-delete {
+      background: none; border: 1px solid #e74c3c; color: #e74c3c;
+      padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-delete:hover { background: #e74c3c; color: white; }
 
     .empty { text-align: center; padding: 3rem; color: #999; }
     .loading { text-align: center; padding: 2rem; color: #999; }
@@ -114,7 +121,10 @@
         container.className = "books-grid";
         container.innerHTML = books.map(b => `
           <div class="book-card">
-            <span class="id-badge">#${b.id}</span>
+            <div class="card-top">
+              <span class="id-badge">#${b.id}</span>
+              <button class="btn-delete" onclick="deleteBook('${b.id}')">Delete</button>
+            </div>
             <div class="title">${esc(b.title)}</div>
             <div class="author">${esc(b.author)}</div>
             <span class="price">$${Number(b.price).toFixed(2)}</span>
@@ -159,6 +169,22 @@
         status.textContent = "Failed to add book. Check the API connection.";
       } finally {
         btn.disabled = false;
+      }
+    }
+
+    async function deleteBook(id) {
+      const status = document.getElementById("status");
+      try {
+        const res = await fetch(API_BASE + "/api/books/" + id, { method: "DELETE" });
+
+        if (!res.ok) throw new Error("Failed to delete book");
+
+        status.className = "status success";
+        status.textContent = "Book deleted.";
+        loadBooks();
+      } catch (err) {
+        status.className = "status error";
+        status.textContent = "Failed to delete book.";
       }
     }
 

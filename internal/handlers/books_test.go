@@ -21,6 +21,7 @@ func setupRouter() (*chi.Mux, *BookHandler) {
 	r.Get("/api/books", h.ListBooks)
 	r.Post("/api/books", h.CreateBook)
 	r.Get("/api/books/{id}", h.GetBook)
+	r.Delete("/api/books/{id}", h.DeleteBook)
 
 	return r, h
 }
@@ -113,6 +114,53 @@ func TestCreateBook(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestDeleteBook(t *testing.T) {
+	r, _ := setupRouter()
+
+	tests := []struct {
+		name       string
+		id         string
+		wantStatus int
+	}{
+		{name: "existing book", id: "1", wantStatus: http.StatusNoContent},
+		{name: "non-existing book", id: "999", wantStatus: http.StatusNotFound},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodDelete, "/api/books/"+tt.id, http.NoBody)
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, req)
+
+			if w.Code != tt.wantStatus {
+				t.Errorf("expected status %d, got %d", tt.wantStatus, w.Code)
+			}
+		})
+	}
+}
+
+func TestDeleteBookThenGet(t *testing.T) {
+	r, _ := setupRouter()
+
+	// Delete book 1.
+	req := httptest.NewRequest(http.MethodDelete, "/api/books/1", http.NoBody)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("expected 204 on delete, got %d", w.Code)
+	}
+
+	// Getting deleted book should return 404.
+	req = httptest.NewRequest(http.MethodGet, "/api/books/1", http.NoBody)
+	w = httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("expected 404 after delete, got %d", w.Code)
 	}
 }
 

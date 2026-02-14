@@ -64,3 +64,18 @@ func (s *BookStore) AddBook(book models.Book) models.Book {
 
 	return book
 }
+
+// DeleteBook removes a book by ID and returns whether it existed.
+func (s *BookStore) DeleteBook(id string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.books[id]
+	if !ok {
+		return false
+	}
+
+	delete(s.books, id)
+
+	return true
+}

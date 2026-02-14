@@ -45,6 +45,7 @@ func main() {
 		r.Get("/", bookHandler.ListBooks)
 		r.Post("/", bookHandler.CreateBook)
 		r.Get("/{id}", bookHandler.GetBook)
+		r.Delete("/{id}", bookHandler.DeleteBook)
 	})
 
 	// Swagger UI.

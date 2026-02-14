@@ -90,6 +90,30 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(created) //nolint:errcheck // response write error is not actionable.
 }
 
+// DeleteBook removes a book from the store by ID.
+//
+//	@Summary		Delete a book
+//	@Description	Removes a book from the store by its ID.
+//	@Tags			books
+//	@Produce		json
+//	@Param			id	path	string	true	"Book ID"
+//	@Success		204	"No Content"
+//	@Failure		404	{object}	ErrorResponse
+//	@Router			/api/books/{id} [delete]
+func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if !h.Store.DeleteBook(id) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ErrorResponse{Message: "book not found"}) //nolint:errcheck // response write error is not actionable.
+
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // ErrorResponse represents an error response body.
 type ErrorResponse struct {
 	Message string `json:"message" example:"book not found"`
