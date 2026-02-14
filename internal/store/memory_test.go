@@ -61,6 +61,34 @@ func TestGetBook(t *testing.T) {
 	}
 }
 
+func TestDeleteBook(t *testing.T) {
+	s := NewBookStore()
+
+	tests := []struct {
+		name    string
+		id      string
+		wantOK  bool
+	}{
+		{name: "existing book", id: "1", wantOK: true},
+		{name: "non-existing book", id: "999", wantOK: false},
+		{name: "already deleted", id: "1", wantOK: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ok := s.DeleteBook(tt.id)
+			if ok != tt.wantOK {
+				t.Errorf("DeleteBook(%q) = %v, want %v", tt.id, ok, tt.wantOK)
+			}
+		})
+	}
+
+	// Verify book count decreased.
+	if len(s.ListBooks()) != 2 {
+		t.Errorf("expected 2 books after delete, got %d", len(s.ListBooks()))
+	}
+}
+
 func TestListBooks(t *testing.T) {
 	s := &BookStore{
 		books:  make(map[string]models.Book),
