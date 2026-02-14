@@ -1,0 +1,62 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - revive
+    - gocritic
+    - errorlint
+    - nolintlint
+    - godot
+    - nlreturn
+    - wrapcheck
+
+  settings:
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - checkPrivateReceivers
+        - name: blank-imports
+        - name: context-as-argument
+        - name: error-return
+        - name: error-naming
+        - name: increment-decrement
+        - name: var-naming
+        - name: package-comments
+
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - opinionated
+
+    godot:
+      scope: toplevel
+      period: true
+      exclude:
+        - "^\\s*@"
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+    wrapcheck:
+      ignore-sigs:
+        - .Encode(
+        - json.NewEncoder(
+        - json.NewDecoder(
+        - json.Marshal(
+        - json.Unmarshal(
+        - .Decode(
+        - .WriteHeader(
+        - fmt.Sprintf(
+        - fmt.Errorf(
+        - errors.New(
+
+  exclusions:
+    generated: strict
+    paths:
+      - docs

@@ -1,0 +1,113 @@
+basePath: /
+definitions:
+  handlers.ErrorResponse:
+    properties:
+      message:
+        example: book not found
+        type: string
+    type: object
+  handlers.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+  models.Book:
+    properties:
+      author:
+        example: Alan Donovan
+        type: string
+      id:
+        example: "1"
+        type: string
+      price:
+        example: 39.99
+        type: number
+      title:
+        example: The Go Programming Language
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A simple bookstore API built with Go and Chi.
+  title: Bookstore API
+  version: "1.0"
+paths:
+  /api/books:
+    get:
+      description: Returns a list of all books in the store.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Book'
+            type: array
+      summary: List all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Adds a new book to the store.
+      parameters:
+      - description: Book to create
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/models.Book'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Create a new book
+      tags:
+      - books
+  /api/books/{id}:
+    get:
+      description: Returns a single book by its ID.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Book'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get a book by ID
+      tags:
+      - books
+  /health:
+    get:
+      description: Returns the health status of the service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+swagger: "2.0"
